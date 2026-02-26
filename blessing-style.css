@@ -9,7 +9,7 @@
     margin: 0;
     padding: 0;
     box-sizing: border-box;
-    -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+    -webkit-tap-highlight-color: transparent;
 }
 
 body {
@@ -22,6 +22,61 @@ body {
     display: flex;
     justify-content: center;
     align-items: center;
+}
+
+/* 飘落爱心容器 */
+#falling-hearts-container {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 1;
+}
+
+/* 飘落爱心的通用样式 */
+.falling-heart {
+    position: absolute;
+    user-select: none;
+    pointer-events: none;
+    /* 新增渐变色效果 */
+    background: linear-gradient(to bottom, #ff3366, #ff6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
+    /* 合并飘落、摇摆和旋转动画 */
+    animation: fall linear forwards, 
+               sway ease-in-out infinite alternate,
+               rotateHeart linear infinite;
+    opacity: 0.8;
+}
+
+@keyframes fall {
+    0% {
+        transform: translateY(-50px);
+    }
+    100% {
+        transform: translateY(110vh);
+    }
+}
+
+@keyframes sway {
+    0% {
+        margin-left: -20px;
+    }
+    100% {
+        margin-left: 20px;
+    }
+}
+
+@keyframes rotateHeart {
+    0% {
+        transform: rotate(0deg);
+    }
+    100% {
+        transform: rotate(360deg);
+    }
 }
 
 .app-container {
@@ -38,7 +93,6 @@ body {
     z-index: 10;
 }
 
-/* 标题样式 */
 header .title {
     font-size: 2rem;
     color: #fff;
@@ -47,7 +101,6 @@ header .title {
     letter-spacing: 2px;
 }
 
-/* 爱心部分 */
 .heart-section {
     flex-grow: 1;
     display: flex;
@@ -57,44 +110,24 @@ header .title {
 }
 
 .beating-heart {
-    position: relative;
-    width: 120px;
-    height: 105px;
-    background: #ff5e78;
-    transform: rotate(-45deg);
+    font-size: 100px;
+    background: linear-gradient(to bottom, #ff3366, #ff6b6b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: inline-block;
     animation: heartBeat 1.2s infinite ease-in-out;
     cursor: pointer;
-    box-shadow: 0 0 40px rgba(255, 94, 120, 0.6);
-}
-
-.beating-heart:before,
-.beating-heart:after {
-    content: "";
-    position: absolute;
-    width: 120px;
-    height: 120px;
-    background: #ff5e78;
-    border-radius: 50%;
-}
-
-.beating-heart:before {
-    top: -60px;
-    left: 0;
-}
-
-.beating-heart:after {
-    top: 0;
-    left: 60px;
+    filter: drop-shadow(0 0 20px rgba(255, 94, 120, 0.4));
+    user-select: none;
 }
 
 @keyframes heartBeat {
-    0%, 100% { transform: scale(1) rotate(-45deg); }
-    15% { transform: scale(1.25) rotate(-45deg); }
-    30% { transform: scale(1) rotate(-45deg); }
-    45% { transform: scale(1.15) rotate(-45deg); }
+    0%, 100% { transform: scale(1); }
+    15% { transform: scale(1.25); }
+    30% { transform: scale(1); }
+    45% { transform: scale(1.1); }
 }
 
-/* 祝福卡片 */
 .blessing-card {
     background: var(--white-transparent);
     backdrop-filter: blur(8px);
@@ -111,10 +144,6 @@ header .title {
     box-shadow: 0 10px 20px rgba(0,0,0,0.05);
 }
 
-.blessing-card:active {
-    transform: scale(0.98);
-}
-
 #blessing-text {
     font-size: 1.2rem;
     line-height: 1.6;
@@ -122,7 +151,6 @@ header .title {
     font-weight: 500;
 }
 
-/* 按钮样式 */
 .gift-btn {
     background: #ff85a2;
     color: white;
@@ -135,13 +163,7 @@ header .title {
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     margin-bottom: 15px;
-}
-
-.gift-btn:active {
-    transform: scale(0.95);
-    box-shadow: 0 5px 10px rgba(255, 133, 162, 0.4);
 }
 
 .btn-shine {
@@ -150,12 +172,7 @@ header .title {
     left: -100%;
     width: 100%;
     height: 100%;
-    background: linear-gradient(
-        120deg,
-        transparent,
-        rgba(255, 255, 255, 0.3),
-        transparent
-    );
+    background: linear-gradient(120deg, transparent, rgba(255, 255, 255, 0.3), transparent);
     transition: all 0.6s;
 }
 
@@ -166,27 +183,59 @@ header .title {
 .footer-hint {
     font-size: 0.9rem;
     color: rgba(255, 255, 255, 0.7);
-    margin-top: 5px;
 }
 
-/* 飘出的小爱心样式 */
-.floating-heart {
+/* 爆发式爱心样式 */
+.burst-heart {
     position: absolute;
-    color: #ff5e78;
-    font-size: 20px;
-    user-select: none;
     pointer-events: none;
-    animation: floatUp 3s forwards ease-out;
+    animation: burstUp 3s forwards ease-out;
     z-index: 100;
 }
 
-@keyframes floatUp {
-    0% {
-        transform: translateY(0) rotate(0) scale(1);
-        opacity: 1;
-    }
-    100% {
-        transform: translateY(-500px) rotate(360deg) scale(1.5);
-        opacity: 0;
-    }
+@keyframes burstUp {
+    0% { transform: translateY(0) rotate(0) scale(1); opacity: 1; }
+    100% { transform: translateY(-500px) rotate(360deg) scale(1.5); opacity: 0; }
+}
+
+/* 音乐控制按钮 */
+.music-control {
+    position: fixed;
+    bottom: 30px;
+    right: 30px;
+    width: 50px;
+    height: 50px;
+    background: var(--white-transparent);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    z-index: 1000;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.music-control:hover {
+    transform: scale(1.1);
+    background: rgba(255, 255, 255, 0.6);
+}
+
+.music-icon {
+    font-size: 24px;
+    color: #ff85a2;
+    transition: all 0.3s ease;
+    user-select: none;
+}
+
+/* 播放时的动画 */
+.music-control.playing .music-icon {
+    animation: musicRotate 3s linear infinite;
+}
+
+@keyframes musicRotate {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
 }
