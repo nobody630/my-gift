@@ -1,0 +1,192 @@
+:root {
+    --primary-pink: #ffb7c5;
+    --secondary-purple: #e2c2ff;
+    --dark-pink: #ff85a2;
+    --white-transparent: rgba(255, 255, 255, 0.4);
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    -webkit-tap-highlight-color: transparent; /* 移除移动端点击高亮 */
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    background: linear-gradient(135deg, var(--primary-pink), var(--secondary-purple));
+    font-family: 'ZCOOL KuaiLe', 'ZCOOL XiaoWei', 'Segoe UI', cursive, sans-serif;
+    color: #fff;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app-container {
+    width: 100%;
+    height: 100%;
+    max-width: 500px;
+    padding: 40px 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    align-items: center;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+}
+
+/* 标题样式 */
+header .title {
+    font-size: 2rem;
+    color: #fff;
+    text-shadow: 2px 2px 4px rgba(255, 133, 162, 0.5);
+    margin-top: 20px;
+    letter-spacing: 2px;
+}
+
+/* 爱心部分 */
+.heart-section {
+    flex-grow: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin: 40px 0;
+}
+
+.beating-heart {
+    position: relative;
+    width: 120px;
+    height: 105px;
+    background: #ff5e78;
+    transform: rotate(-45deg);
+    animation: heartBeat 1.2s infinite ease-in-out;
+    cursor: pointer;
+    box-shadow: 0 0 40px rgba(255, 94, 120, 0.6);
+}
+
+.beating-heart:before,
+.beating-heart:after {
+    content: "";
+    position: absolute;
+    width: 120px;
+    height: 120px;
+    background: #ff5e78;
+    border-radius: 50%;
+}
+
+.beating-heart:before {
+    top: -60px;
+    left: 0;
+}
+
+.beating-heart:after {
+    top: 0;
+    left: 60px;
+}
+
+@keyframes heartBeat {
+    0%, 100% { transform: scale(1) rotate(-45deg); }
+    15% { transform: scale(1.25) rotate(-45deg); }
+    30% { transform: scale(1) rotate(-45deg); }
+    45% { transform: scale(1.15) rotate(-45deg); }
+}
+
+/* 祝福卡片 */
+.blessing-card {
+    background: var(--white-transparent);
+    backdrop-filter: blur(8px);
+    padding: 25px;
+    border-radius: 20px;
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    width: 90%;
+    min-height: 120px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    margin-bottom: 30px;
+    transition: transform 0.3s ease;
+    box-shadow: 0 10px 20px rgba(0,0,0,0.05);
+}
+
+.blessing-card:active {
+    transform: scale(0.98);
+}
+
+#blessing-text {
+    font-size: 1.2rem;
+    line-height: 1.6;
+    color: #7d5a5a;
+    font-weight: 500;
+}
+
+/* 按钮样式 */
+.gift-btn {
+    background: #ff85a2;
+    color: white;
+    border: none;
+    padding: 15px 50px;
+    border-radius: 50px;
+    font-size: 1.3rem;
+    font-family: inherit;
+    box-shadow: 0 10px 20px rgba(255, 133, 162, 0.4);
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    margin-bottom: 15px;
+}
+
+.gift-btn:active {
+    transform: scale(0.95);
+    box-shadow: 0 5px 10px rgba(255, 133, 162, 0.4);
+}
+
+.btn-shine {
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+        120deg,
+        transparent,
+        rgba(255, 255, 255, 0.3),
+        transparent
+    );
+    transition: all 0.6s;
+}
+
+.gift-btn:hover .btn-shine {
+    left: 100%;
+}
+
+.footer-hint {
+    font-size: 0.9rem;
+    color: rgba(255, 255, 255, 0.7);
+    margin-top: 5px;
+}
+
+/* 飘出的小爱心样式 */
+.floating-heart {
+    position: absolute;
+    color: #ff5e78;
+    font-size: 20px;
+    user-select: none;
+    pointer-events: none;
+    animation: floatUp 3s forwards ease-out;
+    z-index: 100;
+}
+
+@keyframes floatUp {
+    0% {
+        transform: translateY(0) rotate(0) scale(1);
+        opacity: 1;
+    }
+    100% {
+        transform: translateY(-500px) rotate(360deg) scale(1.5);
+        opacity: 0;
+    }
+}
