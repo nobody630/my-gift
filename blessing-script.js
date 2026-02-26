@@ -16,23 +16,41 @@ const blessings = [
 const blessingText = document.getElementById('blessing-text');
 const giftBtn = document.getElementById('gift-btn');
 
-// 当前显示的祝福语索引
-let currentIndex = -1;
+// 存储剩余未显示的祝福语（打乱后的副本）
+let remainingBlessings = [];
 
-// 显示随机祝福语（不和当前重复）
+// Fisher–Yates 洗牌算法：随机打乱数组
+function shuffleArray(array) {
+    const shuffled = [...array];
+    for (let i = shuffled.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+    }
+    return shuffled;
+}
+
+// 初始化或重置剩余祝福语池
+function resetRemainingBlessings() {
+    remainingBlessings = shuffleArray(blessings);
+}
+
+// 显示一条祝福语（从剩余池中取，不重复）
 function showRandomBlessing() {
     if (!blessingText) return;
     
-    let newIndex;
-    do {
-        newIndex = Math.floor(Math.random() * blessings.length);
-    } while (newIndex === currentIndex && blessings.length > 1);
+    // 如果没有剩余的了，重新打乱填充
+    if (remainingBlessings.length === 0) {
+        resetRemainingBlessings();
+    }
     
-    currentIndex = newIndex;
-    blessingText.textContent = blessings[currentIndex];
+    // 从剩余池中取出第一条（或最后一条）并显示
+    // 这里用 pop() 从末尾取，效率更高
+    const nextBlessing = remainingBlessings.pop();
+    blessingText.textContent = nextBlessing;
 }
 
-// 页面加载时显示第一条
+// 页面加载时初始化并显示第一条
+resetRemainingBlessings();
 window.addEventListener('load', function() {
     showRandomBlessing();
 });
@@ -93,7 +111,8 @@ window.addEventListener('load', function() {
     
     // 音乐播放结束自动重新开始（loop 属性已经处理）
 });
-// ==================== 飘落爱心特效（独立模块，不影响其他功能）====================
+
+// ==================== 飘落爱心特效（独立模块）====================
 (function() {
     // 创建容器（如果不存在）
     let container = document.getElementById('falling-hearts-container');
@@ -105,7 +124,7 @@ window.addEventListener('load', function() {
         container.style.left = '0';
         container.style.width = '100%';
         container.style.height = '100%';
-        container.style.pointerEvents = 'none'; // 让点击穿透到下面的按钮
+        container.style.pointerEvents = 'none';
         container.style.zIndex = '999';
         document.body.appendChild(container);
     }
@@ -113,43 +132,22 @@ window.addEventListener('load', function() {
     // 爱心颜色数组
     const colors = ['#ff9a9e', '#ffb6c1', '#ffc0cb', '#ff85a2', '#fbc2eb', '#ff99cc'];
 
-    // 创建单个爱心
     function createHeart() {
         const heart = document.createElement('div');
         heart.innerHTML = '❤️';
         heart.style.position = 'absolute';
         heart.style.left = Math.random() * 100 + '%';
         heart.style.top = '-50px';
-        heart.style.fontSize = Math.floor(Math.random() * 20 + 20) + 'px'; // 20-40px
+        heart.style.fontSize = Math.floor(Math.random() * 20 + 20) + 'px';
         heart.style.color = colors[Math.floor(Math.random() * colors.length)];
-        heart.style.opacity = Math.random() * 0.5 + 0.3; // 0.3-0.8
+        heart.style.opacity = Math.random() * 0.5 + 0.3;
         heart.style.transform = 'rotate(' + (Math.random() * 30 - 15) + 'deg)';
-        heart.style.transition = 'transform ' + (Math.random() * 3 + 5) + 's linear';
         heart.style.pointerEvents = 'none';
-        
-        // 随机左右摇摆的动画
-        const swingAmount = Math.random() * 30 - 15;
-        heart.style.animation = `swing-${Date.now()}-${Math.random()} ${Math.random() * 3 + 4}s ease-in-out infinite`;
-        
-        // 添加自定义动画
-        const style = document.createElement('style');
-        const animationName = `swing-${Date.now()}-${Math.random()}`.replace(/\./g, '');
-        style.textContent = `
-            @keyframes ${animationName} {
-                0% { transform: translateX(0) rotate(${Math.random() * 20 - 10}deg); }
-                25% { transform: translateX(${swingAmount}px) rotate(${Math.random() * 20 - 10}deg); }
-                50% { transform: translateX(0) rotate(${Math.random() * 20 - 10}deg); }
-                75% { transform: translateX(${-swingAmount}px) rotate(${Math.random() * 20 - 10}deg); }
-                100% { transform: translateX(0) rotate(${Math.random() * 20 - 10}deg); }
-            }
-        `;
-        document.head.appendChild(style);
-        heart.style.animation = `${animationName} ${Math.random() * 3 + 4}s ease-in-out infinite`;
         
         container.appendChild(heart);
         
         // 向下飘落
-        const duration = Math.random() * 5 + 5; // 5-10秒
+        const duration = Math.random() * 5 + 5;
         const startTime = Date.now();
         const startTop = -50;
         const endTop = window.innerHeight + 100;
@@ -165,40 +163,37 @@ window.addEventListener('load', function() {
                 requestAnimationFrame(fall);
             } else {
                 heart.remove();
-                style.remove(); // 清理动画样式
             }
         }
         
         requestAnimationFrame(fall);
     }
 
-    // 控制爱心数量，同时保持15-20个
+    // 控制爱心数量
     function maintainHearts() {
         const currentHearts = container.children.length;
-        const targetCount = Math.floor(Math.random() * 6) + 15; // 15-20
+        const targetCount = Math.floor(Math.random() * 6) + 15;
         
         if (currentHearts < targetCount) {
             const toAdd = targetCount - currentHearts;
             for (let i = 0; i < toAdd; i++) {
-                setTimeout(createHeart, i * 200); // 间隔创建，避免同时出现
+                setTimeout(createHeart, i * 200);
             }
         }
     }
 
-    // 每2秒检查并补充爱心
     setInterval(maintainHearts, 2000);
     
-    // 初始化时先创建一批
     for (let i = 0; i < 15; i++) {
         setTimeout(createHeart, i * 100);
     }
 })();
+
 // ==================== 点击“送给你”炸出爱心效果 ====================
 (function() {
     const giftBtn = document.getElementById('gift-btn');
     if (!giftBtn) return;
 
-    // 炸出爱心的颜色
     const burstColors = ['#ff9a9e', '#ffb6c1', '#ffc0cb', '#ff85a2', '#fbc2eb'];
 
     function createBurstHeart(x, y) {
@@ -207,7 +202,7 @@ window.addEventListener('load', function() {
         heart.style.position = 'fixed';
         heart.style.left = x + 'px';
         heart.style.top = y + 'px';
-        heart.style.fontSize = Math.floor(Math.random() * 10 + 20) + 'px'; // 20-30px
+        heart.style.fontSize = Math.floor(Math.random() * 10 + 20) + 'px';
         heart.style.color = burstColors[Math.floor(Math.random() * burstColors.length)];
         heart.style.opacity = '1';
         heart.style.zIndex = '1000';
@@ -215,38 +210,31 @@ window.addEventListener('load', function() {
         heart.style.transition = 'all 1.5s ease-out';
         document.body.appendChild(heart);
 
-        // 随机方向和距离
         const angle = Math.random() * Math.PI * 2;
-        const distance = Math.random() * 150 + 50; // 50-200px
+        const distance = Math.random() * 150 + 50;
         const dx = Math.cos(angle) * distance;
-        const dy = Math.sin(angle) * distance - 30; // 稍微向上飘
+        const dy = Math.sin(angle) * distance - 30;
 
-        // 触发动画
         setTimeout(() => {
             heart.style.transform = `translate(${dx}px, ${dy}px) rotate(${Math.random() * 360}deg)`;
             heart.style.opacity = '0';
         }, 10);
 
-        // 1.5秒后移除
         setTimeout(() => {
             heart.remove();
         }, 1500);
     }
 
-    // 给按钮添加点击事件（不影响原来的祝福语更换）
-    const originalClick = giftBtn.onclick;
     giftBtn.addEventListener('click', function(e) {
-        // 获取按钮中心位置
         const rect = giftBtn.getBoundingClientRect();
         const centerX = rect.left + rect.width / 2;
         const centerY = rect.top + rect.height / 2;
 
-        // 炸出15-20个爱心
-        const count = Math.floor(Math.random() * 6) + 15; // 15-20
+        const count = Math.floor(Math.random() * 6) + 15;
         for (let i = 0; i < count; i++) {
             setTimeout(() => {
                 createBurstHeart(centerX, centerY);
-            }, i * 30); // 稍微错开时间，更有层次感
+            }, i * 30);
         }
     });
 })();

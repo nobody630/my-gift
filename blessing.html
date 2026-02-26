@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>A gift for 五芒星</title>
+    <link rel="stylesheet" href="blessing-style.css">
+    <link href="https://fonts.googleapis.com/css2?family=ZCOOL+XiaoWei&family=ZCOOL+KuaiLe&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- 飘落爱心的背景层 -->
+    <div id="falling-hearts-container"></div>
+
+    <div class="app-container">
+        <header>
+            <h1 class="title">王梦溪，天天开心呀</h1>
+        </header>
+
+        <main>
+            <div class="heart-section">
+                <div class="beating-heart">&#10084;</div>
+            </div>
+
+            <div class="blessing-card" id="blessing-card">
+                <p id="blessing-text">正在为你加载今日份好心情...</p>
+            </div>
+        </main>
+
+        <footer>
+            <button class="gift-btn" id="gift-btn">
+                <span>送给你</span>
+                <div class="btn-shine"></div>
+            </button>
+            <p class="footer-hint">愿你被这个世界温柔以待</p>
+        </footer>
+    </div>
+
+    <!-- 底部点击按钮时的爆发爱心容器 -->
+    <div id="heart-burst-container"></div>
+
+    <script src="blessing-script.js"></script>
+
+    <!-- 音乐播放器组件 -->
+    <audio id="bg-music" src="qingtian.mp3" loop></audio>
+    <div class="music-control" id="music-btn">
+        <div class="music-icon" id="music-icon">♬</div>
+    </div>
+</body>
+</html>
