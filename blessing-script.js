@@ -12,6 +12,100 @@ const blessings = [
     "春风得意马蹄疾，一日看尽长安花❤️",
 ];
 
+// ==================== 密码锁逻辑 ====================
+(function() {
+    const loginPage = document.getElementById('login-page');
+    const mainContent = document.getElementById('main-content');
+    const passwordInput = document.getElementById('password-input');
+    const unlockBtn = document.getElementById('unlock-btn');
+    const errorMsg = document.getElementById('error-msg');
+    const passwordHint = document.getElementById('password-hint');
+
+    // 这里设置正确的密码（生日）
+    const CORRECT_PASSWORD = "030622"; 
+    let errorCount = 0;
+
+    function validatePassword() {
+        const inputVal = passwordInput.value.trim();
+        
+        if (inputVal === CORRECT_PASSWORD) {
+            // 播放成功小音效 (Web Audio API)
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                const oscillator = audioCtx.createOscillator();
+                const gainNode = audioCtx.createGain();
+                oscillator.type = 'sine';
+                oscillator.frequency.setValueAtTime(880, audioCtx.currentTime); // A5
+                oscillator.frequency.exponentialRampToValueAtTime(1320, audioCtx.currentTime + 0.1); // E6
+                gainNode.gain.setValueAtTime(0.1, audioCtx.currentTime);
+                gainNode.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+                oscillator.connect(gainNode);
+                gainNode.connect(audioCtx.destination);
+                oscillator.start();
+                oscillator.stop(audioCtx.currentTime + 0.3);
+            } catch(e) { console.log("Audio play failed"); }
+
+            // 验证成功
+            unlockBtn.textContent = "✨ 解锁成功... ✨";
+            unlockBtn.style.background = "linear-gradient(45deg, #4CAF50, #81C784)";
+            errorMsg.textContent = "";
+            passwordHint.style.display = 'none';
+            errorCount = 0;
+            
+            // 延迟一点点跳转，让用户看到成功状态
+            setTimeout(() => {
+                loginPage.classList.add('fade-out');
+                // 彻底移除登录页并显示主内容
+                setTimeout(() => {
+                    loginPage.style.display = 'none';
+                    mainContent.style.display = 'flex';
+                    // 触发第一个祝福语显示（如果还没显示的话）
+                    if (typeof showRandomBlessing === 'function') {
+                        showRandomBlessing();
+                    }
+                }, 800);
+            }, 600);
+            
+        } else {
+            // 验证失败
+            errorCount++;
+            passwordInput.classList.add('shake');
+            errorMsg.textContent = "密码不对哦，再试试 ❤️";
+            passwordInput.value = "";
+            
+            // 输错次数逻辑
+            if (errorCount === 2) {
+                passwordHint.style.display = 'block';
+                passwordHint.style.opacity = '0.5';
+            } else if (errorCount >= 3) {
+                passwordHint.style.display = 'block';
+                passwordHint.style.opacity = '1';
+            }
+            
+            // 移除抖动类以便下次触发
+            setTimeout(() => {
+                passwordInput.classList.remove('shake');
+            }, 400);
+        }
+    }
+
+    if (unlockBtn && passwordInput) {
+        unlockBtn.addEventListener('click', validatePassword);
+        
+        // 支持回车键
+        passwordInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                validatePassword();
+            }
+        });
+
+        // 只能输入数字
+        passwordInput.addEventListener('input', (e) => {
+            e.target.value = e.target.value.replace(/[^\d]/g, '');
+        });
+    }
+})();
+
 // 获取页面元素
 const blessingText = document.getElementById('blessing-text');
 const giftBtn = document.getElementById('gift-btn');
